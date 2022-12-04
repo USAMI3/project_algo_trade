@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "582378144196",
+    "project_id": "algotrade-c5836",
+    "storage_bucket": "algotrade-c5836.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:582378144196:android:5ee0412671170956ec2491",
+        "android_client_info": {
+          "package_name": "com.example.project_algo_trade"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "582378144196-5l045uvffjeub5lkb1g0cf5vcilju4uo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFWC2xaxZKmCc_hfiFCVoJgWiAql7txLE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "582378144196-5l045uvffjeub5lkb1g0cf5vcilju4uo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
