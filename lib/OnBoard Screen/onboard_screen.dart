@@ -48,7 +48,7 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
       child: Scaffold(
         backgroundColor: const Color.fromRGBO(26, 39, 68, 1),
         body: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             width: size.width,
             height: size.height,
             child: Stack(

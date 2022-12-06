@@ -1,7 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:project_algo_trade/AppConfiguration/app_routes.dart';
 import 'package:project_algo_trade/Auth/auth_controller.dart';
+import 'package:project_algo_trade/Commons/commons.dart';
 import 'package:project_algo_trade/screens/brokerage_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -163,6 +167,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget buildListView(Size size, BuildContext context) {
     return ListView(
+      physics: BouncingScrollPhysics(),
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
@@ -276,9 +281,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    if (controller.emailController.text.isNotEmpty ||
-                        controller.passwordController.text.isNotEmpty) {
+                    if (controller.emailController.text.isNotEmpty &&
+                        controller.nameController.text.isNotEmpty &&
+                        controller.passwordController.text.isNotEmpty &&
+                        EmailValidator.validate(
+                                controller.emailController.text) ==
+                            true) {
                       Get.to(() => BrokerageScreen());
+                    } else {
+                      Commons.showSnackBar("Alert", "Invalid data entered");
                     }
                   },
                 ),

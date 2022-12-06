@@ -19,7 +19,7 @@ class _MainEducationScreenState extends State<MainEducationScreen> {
         appBar: AppBar(
           backgroundColor: Commons.mylightColor,
           elevation: 0,
-          title: Text(
+          title: const Text(
             "Educational Resources",
             style: TextStyle(
               color: Commons.myWhiteColor,

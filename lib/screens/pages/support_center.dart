@@ -198,7 +198,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   borderRadius: BorderRadius.circular(10),
                   color: Colors.red,
                 ),
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.close,
                     color: Commons.myWhiteColor,
@@ -217,7 +217,13 @@ class _SupportScreenState extends State<SupportScreen> {
             ),
             child: TextButton(
               onPressed: () {
-                controller.uploadTickets();
+                if (controller.supportEmailController.text.isNotEmpty &&
+                    controller.supportNameController.text.isNotEmpty &&
+                    controller.supportMessageController.text.isNotEmpty) {
+                  controller.uploadTickets();
+                } else {
+                  Commons.showSnackBar("Alert", "Please fill all the fields");
+                }
               },
               child: const Text(
                 "Submit",

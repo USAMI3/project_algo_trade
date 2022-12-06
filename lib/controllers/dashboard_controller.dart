@@ -1,8 +1,11 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:candlesticks/candlesticks.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:project_algo_trade/Auth/auth_controller.dart';
 import 'package:project_algo_trade/Commons/commons.dart';
 import 'package:project_algo_trade/models/broker_model.dart';
 import 'package:project_algo_trade/models/data_models.dart';
@@ -21,6 +24,7 @@ class DashboardController extends GetxController {
     getHightlightsData2();
     getHightlightsData3();
     getNewsData();
+    setGreet();
 
     // getHightlightsData4();
     super.onInit();
@@ -112,7 +116,6 @@ class DashboardController extends GetxController {
     // isLoading.value = false;
     await apiRequests.getHttpData().then((value) {
       candles = value;
-      print(candles);
     }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
@@ -120,19 +123,37 @@ class DashboardController extends GetxController {
   Future<void> getTradeData(
       String symbol, String apiKey, String secretKey) async {
     // isLoading.value = false;
-    await apiRequests.buyTrade("GOOGL", apiKey, secretKey).then((value) {
+    await apiRequests.buyTrade(symbol, apiKey, secretKey).then((value) {
       tradeModel = value;
       update();
-      print(value);
     }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
 
-  Future<void> getTradeDataSell() async {
+  Future<void> getCryptoTradeData(
+      String symbol, String apiKey, String secretKey) async {
     // isLoading.value = false;
-    await apiRequests.sellTrade("GOOGL").then((value) {
+    await apiRequests.buyCryptoTrade(symbol, apiKey, secretKey).then((value) {
       tradeModel = value;
-      print(value);
+      update();
+    }).onError((error, stackTrace) {});
+    // isLoading.value = false;
+  }
+
+  Future<void> getTradeCryptoDataSell(
+      String symbol, String apiKey, String secretKey) async {
+    // isLoading.value = false;
+    await apiRequests.sellCryptoTrade(symbol, apiKey, secretKey).then((value) {
+      tradeModel = value;
+    }).onError((error, stackTrace) {});
+    // isLoading.value = false;
+  }
+
+  Future<void> getTradeDataSell(
+      String symbol, String apiKey, String secretKey) async {
+    // isLoading.value = false;
+    await apiRequests.sellTrade(symbol, apiKey, secretKey).then((value) {
+      tradeModel = value;
     }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
@@ -141,7 +162,14 @@ class DashboardController extends GetxController {
     // isLoading.value = false;
     await apiRequests.getOrders(apiKey, secretKey).then((value) {
       ordersModel = value;
-      print(value);
+    }).onError((error, stackTrace) {});
+    // isLoading.value = false;
+  }
+
+  Future<void> getPositionsData(String apiKey, String secretKey) async {
+    // isLoading.value = false;
+    await apiRequests.getOrders(apiKey, secretKey).then((value) {
+      ordersModel = value;
     }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
@@ -150,7 +178,6 @@ class DashboardController extends GetxController {
     // isLoading.value = false;
     await apiRequests.connectAlpaca(apikey, secretKey).then((value) {
       brokerAccountModel = value;
-      print(brokerAccountModel);
     }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
@@ -175,9 +202,7 @@ class DashboardController extends GetxController {
     // isLoading.value = false;
     await apiRequests.getHttpData4().then((value) {
       candles4 = value;
-    }).onError((error, stackTrace) {
-      print(error);
-    });
+    }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
 
@@ -185,9 +210,7 @@ class DashboardController extends GetxController {
     // isLoading.value = false;
     await apiRequests.getNewsData().then((value) {
       newsData = value;
-    }).onError((error, stackTrace) {
-      print(error);
-    });
+    }).onError((error, stackTrace) {});
     // isLoading.value = false;
   }
 

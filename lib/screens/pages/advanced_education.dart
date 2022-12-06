@@ -79,7 +79,7 @@ class _AdvancedEducationScreenState extends State<AdvancedEducationScreen> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.02,
               ),
-              AutoSizeText(
+              const AutoSizeText(
                 "Trading indicators every trader should know",
                 style: TextStyle(
                   color: Commons.myGreenColor,
@@ -90,7 +90,7 @@ class _AdvancedEducationScreenState extends State<AdvancedEducationScreen> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.01,
               ),
-              AutoSizeText(
+              const AutoSizeText(
                 "1.	Moving average (MA)",
                 style: TextStyle(
                   color: Commons.myGreenColor,
@@ -137,7 +137,7 @@ class _AdvancedEducationScreenState extends State<AdvancedEducationScreen> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.02,
               ),
-              AutoSizeText(
+              const AutoSizeText(
                 "2.	Moving average convergence divergence (MACD)",
                 style: TextStyle(
                   color: Commons.myGreenColor,
@@ -168,7 +168,7 @@ class _AdvancedEducationScreenState extends State<AdvancedEducationScreen> {
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.02,
               ),
-              AutoSizeText(
+              const AutoSizeText(
                 "3.	Relative strength index (RSI)",
                 style: TextStyle(
                   color: Commons.myGreenColor,
@@ -199,7 +199,7 @@ An overbought signal suggests that short-term gains may be reaching a point of m
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.02,
               ),
-              AutoSizeText(
+              const AutoSizeText(
                 "4.	Bollinger bands",
                 style: TextStyle(
                   color: Commons.myGreenColor,

@@ -4,10 +4,11 @@ import 'package:get/get.dart';
 import 'package:project_algo_trade/Auth/login_screen.dart';
 import 'package:project_algo_trade/models/broker_model.dart';
 import 'package:project_algo_trade/screens/Chat/chat_controller.dart';
+import 'package:project_algo_trade/screens/pages/account_activity.dart';
 import 'package:project_algo_trade/screens/pages/main_education.dart';
-import 'package:project_algo_trade/screens/pages/payment_methods.dart';
 import 'package:project_algo_trade/screens/pages/support_center.dart';
 import 'package:project_algo_trade/services/api_services.dart';
+import 'package:project_algo_trade/shared_pref_class.dart';
 
 import '../Commons/commons.dart';
 import '../controllers/dashboard_controller.dart';
@@ -132,18 +133,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             controller.userModel.apiKey!,
                             controller.userModel.secretKey!),
                         builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            print("object");
-                          }
+                          if (snapshot.hasError) {}
                           if (snapshot.hasData) {
                             final data = snapshot.data;
+                            final cash = double.tryParse(data!.cash!);
                             return BuildContainer(
                               iconData: Icons.monetization_on_rounded,
-                              text1: "${data!.buyingPower}",
+                              text1: "${cash!.toInt()}",
                               text2: "Total balance",
                             );
                           }
-                          return SizedBox();
+                          return const SizedBox();
                         },
                       ),
                       SizedBox(
@@ -162,15 +162,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                   child: Column(
                     children: [
-                      // RowWidget(
-                      //   icon: Icons.payments_outlined,
-                      //   text: "Payment methods",
-                      //   onTap: () {
-                      //     Navigator.of(context).push(MaterialPageRoute(
-                      //         builder: ((context) =>
-                      //             const PaymentMethodsScreen())));
-                      //   },
-                      // ),
+                      RowWidget(
+                        icon: Icons.payments_outlined,
+                        text: "Account Activity",
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: ((context) => const AccountActivity())));
+                        },
+                      ),
                       RowWidget(
                         icon: Icons.question_mark,
                         text: "Support center",
@@ -193,7 +192,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         text: "Logout",
                         onTap: () {
                           FirebaseAuth.instance.signOut();
-
+                          sharedPrefs.isLoggedIn = false;
+                          Get.delete<DashboardController>();
                           Get.off(() => const LoginScreen());
                         },
                       ),
@@ -229,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               text2: "Name",
             ),
 
-            Text(
+            const Text(
               "Reset Password?",
               style: TextStyle(
                   fontWeight: FontWeight.w600,
@@ -456,6 +456,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Commons.showSnackBar(
                         "Notification", "Changes saved successfully");
                   });
+                } else {
+                  Commons.showSnackBar("Alert", "Please fill in the fields");
                 }
               },
               child: const Text(
@@ -513,7 +515,7 @@ class BuildTextField extends StatelessWidget {
             child: TextFormField(
               controller: controller,
               cursorColor: Colors.white,
-              autofocus: true,
+              autofocus: false,
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 focusedBorder: InputBorder.none,
@@ -585,7 +587,6 @@ class BuildContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.15,
       width: MediaQuery.of(context).size.width * 0.3,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),

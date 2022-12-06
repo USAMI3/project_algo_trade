@@ -45,6 +45,8 @@ dependencies:
   url_launcher: ^6.1.6
   starflut: ^1.0.0
   dio: ^4.0.6
+  shared_preferences: ^2.0.15
+  email_validator: ^2.1.17
 
 
 dev_dependencies:

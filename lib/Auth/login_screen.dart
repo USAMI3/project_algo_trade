@@ -1,8 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:project_algo_trade/AppConfiguration/app_routes.dart';
 import 'package:project_algo_trade/Auth/auth_controller.dart';
 import 'package:project_algo_trade/Commons/commons.dart';
+import 'package:project_algo_trade/controllers/dashboard_controller.dart';
 import 'package:project_algo_trade/screens/Chat/chat_controller.dart';
 import 'package:project_algo_trade/screens/settings_screen.dart';
 
@@ -16,6 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final AuthController controller = Get.put(AuthController());
   final chatController = Get.put(ChatController());
+  final dashboardController = Get.put(DashboardController());
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -131,6 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget buildListView(Size size, BuildContext context) {
     return ListView(
+      physics: const BouncingScrollPhysics(),
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 70, left: 20, right: 20),
@@ -229,8 +233,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    controller.signIn(controller.emailController.text,
-                        controller.passwordController.text);
+                    if (controller.emailController.text.isNotEmpty &&
+                        controller.passwordController.text.isNotEmpty &&
+                        EmailValidator.validate(
+                                controller.emailController.text) ==
+                            true) {
+                      controller.signIn(controller.emailController.text,
+                          controller.passwordController.text);
+                    } else {
+                      Commons.showSnackBar("Alert", "Invalid data entered");
+                    }
                   },
                 ),
               ),

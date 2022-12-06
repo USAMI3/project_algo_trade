@@ -12,18 +12,32 @@ class Commons {
     return Get.snackbar(
       title,
       message,
+      icon: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: SizedBox(
+          height: 40,
+          width: 40,
+          child: Image.asset("assets/images/001-bot.png"),
+        ),
+      ),
       titleText: Text(
         title,
         style: const TextStyle(
           fontSize: 18,
-          color: Colors.black,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontFamily: 'ColfaxBold',
         ),
       ),
       maxWidth: 500,
-      backgroundColor: Colors.white,
+      backgroundColor: Commons.myGreenColor,
       messageText: Text(
         message,
-        style: const TextStyle(color: Colors.black, fontSize: 14),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontFamily: 'ColfaxBold',
+        ),
       ),
       snackPosition: SnackPosition.TOP,
       margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),

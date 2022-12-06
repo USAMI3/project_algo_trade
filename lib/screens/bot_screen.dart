@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_import, prefer_const_literals_to_create_immutables, depend_on_referenced_packages
 
 import 'dart:async';
 import 'dart:convert';
@@ -10,11 +10,14 @@ import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:project_algo_trade/Commons/commons.dart';
 import 'package:project_algo_trade/models/broker_model.dart';
 import 'package:project_algo_trade/models/order_model.dart';
+import 'package:project_algo_trade/models/position_model.dart';
 import 'package:project_algo_trade/screens/Chat/chat_controller.dart';
 import 'package:project_algo_trade/screens/charts.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_algo_trade/screens/home_screen.dart';
 import 'package:project_algo_trade/services/api_services.dart';
 import 'package:intl/intl.dart';
+import 'package:project_algo_trade/shared_pref_class.dart';
 import '../controllers/dashboard_controller.dart';
 
 class BotScreen extends StatefulWidget {
@@ -36,8 +39,11 @@ class _BotScreenState extends State<BotScreen> {
         body: SafeArea(child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
           return Container(
-            child: _buildListView(
-                Size(constraints.maxWidth, constraints.maxHeight), context),
+            child: sharedPrefs.isBotTrading == false
+                ? _buildListView(
+                    Size(constraints.maxWidth, constraints.maxHeight), context)
+                : _buildListViewBot(
+                    Size(constraints.maxWidth, constraints.maxHeight), context),
           );
         })));
   }
@@ -59,14 +65,191 @@ class _BotScreenState extends State<BotScreen> {
     return "null";
   }
 
+  @override
+  void initState() {
+    controller.positionTimer =
+        Timer.periodic(const Duration(seconds: 3), (Timer t) async {
+      apiRequests.getPositions(
+          controller.userModel.apiKey!, controller.userModel.secretKey!);
+      setState(() {});
+    });
+    controller.balanceTimer =
+        Timer.periodic(const Duration(seconds: 3), (Timer t) async {
+      apiRequests.connectAlpaca(
+          controller.userModel.apiKey!, controller.userModel.secretKey!);
+      setState(() {});
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.positionTimer!.cancel();
+    controller.balanceTimer!.cancel();
+    super.dispose();
+  }
+
+  bool isExpanded = false;
+  bool isExpanded1 = false;
+
   Widget _buildListView(Size size, BuildContext context) {
     return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
       child: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Trade Automation =>",
+                        style: TextStyle(
+                          color: Commons.myGreenColor,
+                          fontFamily: 'ColfaxBold',
+                          fontSize: 16,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.3,
+                                    decoration: BoxDecoration(
+                                      color: Commons.mylightColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          SizedBox(
+                                            height: 40,
+                                            width: 40,
+                                            child: Image.asset(
+                                                "assets/images/001-bot.png"),
+                                          ),
+                                          Text(
+                                            "Automate Trading?",
+                                            style: TextStyle(
+                                              color: Commons.myGreenColor,
+                                              fontFamily: 'ColfaxBold',
+                                              fontSize: 22,
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.06,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.26,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    border: Border.all(
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Decline",
+                                                      style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    sharedPrefs.isBotTrading =
+                                                        true;
+                                                    Navigator.of(context).pop();
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.06,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.26,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.green,
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Accept",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: SizedBox(
+                          height: 60,
+                          width: 60,
+                          child: Image.asset("assets/images/001-bot.png"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 // Container(
                 //   height: MediaQuery.of(context).size.height * 0.4,
                 //   width: MediaQuery.of(context).size.width * 0.95,
@@ -85,6 +268,34 @@ class _BotScreenState extends State<BotScreen> {
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 Container(
+                  height: MediaQuery.of(context).size.height * 0.037,
+                  // width: MediaQuery.of(context).size.width * 0.4,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Commons.myGreenColor,
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: ((context) => ChartsView(
+                                link:
+                                    "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=Binance%3ABTCUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
+                              ))));
+                    },
+                    child: const Text(
+                      "Click to View Chart",
+                      style: TextStyle(
+                        color: Commons.myWhiteColor,
+                        fontSize: 13,
+                        fontFamily: 'ColfaxBold',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
                   height: MediaQuery.of(context).size.height * 0.2,
                   width: MediaQuery.of(context).size.width * 0.95,
                   decoration: BoxDecoration(
@@ -95,7 +306,7 @@ class _BotScreenState extends State<BotScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       // crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
                       children: [
                         FutureBuilder<BrokerAccountModel?>(
                           future: apiRequests.connectAlpaca(
@@ -104,33 +315,51 @@ class _BotScreenState extends State<BotScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.hasData) {
                               final data = snapshot.data;
-                              return Text(
-                                "Total balance: ${data!.buyingPower}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'ColfaxBold',
-                                  fontSize: 16,
-                                ),
+                              final cash = double.tryParse(data!.cash!);
+                              final division = cash! / 100;
+                              final tradeAmount = division * 2;
+                              return Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    "Total balance: \$ ${cash.toInt()}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'ColfaxBold',
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    "Percentage of portfolio used: 2%",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Colfax',
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    "Trade Amount: \$ ${tradeAmount.toInt()}",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontFamily: 'ColfaxBold',
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
                               );
                             }
                             return SizedBox();
                           },
-                        ),
-                        Text(
-                          "Percentage of portfolio used: 2%",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Colfax',
-                            fontSize: 14,
-                          ),
-                        ),
-                        Text(
-                          "Trade Amount: 4000",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontFamily: 'ColfaxBold',
-                            fontSize: 16,
-                          ),
                         ),
                       ],
                     ),
@@ -139,42 +368,236 @@ class _BotScreenState extends State<BotScreen> {
                 SizedBox(
                   height: 20,
                 ),
-
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        decoration: BoxDecoration(
-                          color: Commons.myGreenColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: TextButton(
-                          child: const Text(
-                            "Place Order",
+                  padding: const EdgeInsets.all(12.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Commons.mylightColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: isExpanded == true
+                            ? Border.all(
+                                width: 1,
+                                color: Colors.green,
+                              )
+                            : Border.all(
+                                color: Commons.mylightColor,
+                              )),
+                    child: Theme(
+                      data: Theme.of(context)
+                          .copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Text("Buy/Sell Forex/Stocks here"),
+                        textColor: Colors.green,
+                        iconColor: Colors.green,
+                        collapsedIconColor: Colors.white,
+                        collapsedTextColor: Colors.white,
+                        maintainState: true,
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            isExpanded = value;
+                          });
+                        },
+                        children: [
+                          Text(
+                            "GOOGL",
                             style: TextStyle(
-                              color: Color.fromRGBO(255, 255, 255, 1),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
+                              color: Colors.white,
                               fontFamily: 'ColfaxBold',
+                              fontSize: 20,
                             ),
                           ),
-                          onPressed: () {
-                            dashboardController.getTradeData(
-                                "GOOGL",
-                                controller.userModel.apiKey!,
-                                controller.userModel.secretKey!);
-                            apiRequests.getOrders(controller.userModel.apiKey!,
-                                controller.userModel.secretKey!);
-                            setState(() {});
-                          },
-                        ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 40, horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Commons.myGreenColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: TextButton(
+                                    child: const Text(
+                                      "Buy",
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(255, 255, 255, 1),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontFamily: 'ColfaxBold',
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      dashboardController
+                                          .getTradeData(
+                                              "GOOGL",
+                                              controller.userModel.apiKey!,
+                                              controller.userModel.secretKey!)
+                                          .then((value) => Commons.showSnackBar(
+                                              "Alert",
+                                              "Order placed successfully"));
+
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: TextButton(
+                                    child: const Text(
+                                      "Sell",
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(255, 255, 255, 1),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontFamily: 'ColfaxBold',
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      dashboardController
+                                          .getTradeDataSell(
+                                              "GOOGL",
+                                              controller.userModel.apiKey!,
+                                              controller.userModel.secretKey!)
+                                          .then((value) => Commons.showSnackBar(
+                                              "Alert",
+                                              "Order placed successfully"));
+
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Commons.mylightColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: isExpanded1 == true
+                            ? Border.all(
+                                width: 1,
+                                color: Colors.green,
+                              )
+                            : Border.all(
+                                color: Commons.mylightColor,
+                              )),
+                    child: Theme(
+                      data: Theme.of(context)
+                          .copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        title: Text("Buy/Sell Crypto here"),
+                        textColor: Colors.green,
+                        iconColor: Colors.green,
+                        collapsedIconColor: Colors.white,
+                        collapsedTextColor: Colors.white,
+                        maintainState: true,
+                        onExpansionChanged: (value) {
+                          setState(() {
+                            isExpanded1 = value;
+                          });
+                        },
+                        children: [
+                          Text(
+                            "BTC/USD",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'ColfaxBold',
+                              fontSize: 20,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 40, horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  height: 50,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Commons.myGreenColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: TextButton(
+                                    child: const Text(
+                                      "Buy",
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(255, 255, 255, 1),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontFamily: 'ColfaxBold',
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      dashboardController
+                                          .getCryptoTradeData(
+                                              "BTCUSD",
+                                              controller.userModel.apiKey!,
+                                              controller.userModel.secretKey!)
+                                          .then((value) => Commons.showSnackBar(
+                                              "Alert",
+                                              "Order placed successfully"));
+
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                                Container(
+                                  height: 50,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.3,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: TextButton(
+                                    child: const Text(
+                                      "Sell",
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(255, 255, 255, 1),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontFamily: 'ColfaxBold',
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      dashboardController
+                                          .getTradeCryptoDataSell(
+                                              "BTCUSD",
+                                              controller.userModel.apiKey!,
+                                              controller.userModel.secretKey!)
+                                          .then((value) => Commons.showSnackBar(
+                                              "Alert",
+                                              "Order placed successfully"));
+
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Padding(
@@ -182,7 +605,7 @@ class _BotScreenState extends State<BotScreen> {
                   child: Row(
                     children: [
                       Text(
-                        "Active Orders",
+                        "Active Positions",
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'ColfaxBold',
@@ -194,23 +617,32 @@ class _BotScreenState extends State<BotScreen> {
                 ),
                 GetBuilder<DashboardController>(
                   builder: (ccontroller) {
-                    return FutureBuilder<List<OrdersModel>?>(
-                        future: apiRequests.getOrders(
+                    return FutureBuilder<List<PositionModel>?>(
+                        future: apiRequests.getPositions(
                             controller.userModel.apiKey!,
                             controller.userModel.secretKey!),
                         builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(
+                                child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ));
+                          }
                           if (snapshot.hasData) {
                             final data = snapshot.data;
+
                             return ListView.builder(
                               itemCount: data!.length,
+                              key: UniqueKey(),
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               // reverse: true,
                               itemBuilder: (context, index) {
-                                print(data.length);
-                                var dt = data[index].createdAt;
-                                var d2 = DateFormat('dd MMM yyyy').format(dt!);
-                                print(d2);
+                                final entryPrice =
+                                    double.parse(data[index].avgEntryPrice!);
+                                final currentPrice =
+                                    double.parse(data[index].currentPrice!);
+
                                 return Column(
                                   children: [
                                     SizedBox(
@@ -246,7 +678,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.white,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                         Text(
@@ -255,7 +687,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.green,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                       ],
@@ -271,7 +703,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.white,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                         Text(
@@ -280,7 +712,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.green,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                       ],
@@ -291,21 +723,21 @@ class _BotScreenState extends State<BotScreen> {
                                                     Row(
                                                       children: [
                                                         Text(
-                                                          "Created at: ",
+                                                          "Unrealized PnL: ",
                                                           style: TextStyle(
                                                             color: Colors.white,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                         Text(
-                                                          d2,
+                                                          "\$ ${data[index].unrealizedPl}",
                                                           style: TextStyle(
                                                             color: Colors.green,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                       ],
@@ -321,7 +753,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.white,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                         Text(
@@ -330,7 +762,7 @@ class _BotScreenState extends State<BotScreen> {
                                                             color: Colors.green,
                                                             fontFamily:
                                                                 'ColfaxBold',
-                                                            fontSize: 16,
+                                                            fontSize: 14,
                                                           ),
                                                         ),
                                                       ],
@@ -347,24 +779,23 @@ class _BotScreenState extends State<BotScreen> {
                                                             8.0),
                                                     child: GestureDetector(
                                                       onTap: () {
-                                                        apiRequests.deleteOrders(
-                                                            data[index]
-                                                                .id
-                                                                .toString(),
-                                                            controller.userModel
-                                                                .apiKey!,
-                                                            controller.userModel
-                                                                .secretKey!);
-                                                        apiRequests.getOrders(
-                                                            controller.userModel
-                                                                .apiKey!,
-                                                            controller.userModel
-                                                                .secretKey!);
-                                                        setState(() {});
+                                                        apiRequests
+                                                            .deletePosition(
+                                                                data[index]
+                                                                    .symbol!,
+                                                                controller
+                                                                    .userModel
+                                                                    .apiKey!,
+                                                                controller
+                                                                    .userModel
+                                                                    .secretKey!)
+                                                            .then((value) => Commons
+                                                                .showSnackBar(
+                                                                    "Alert",
+                                                                    "Position closed successfully"));
                                                       },
                                                       child: Container(
-                                                          height: 40,
-                                                          width: 60,
+                                                          height: 30,
                                                           decoration:
                                                               BoxDecoration(
                                                             color: Colors.red,
@@ -374,15 +805,48 @@ class _BotScreenState extends State<BotScreen> {
                                                                         10),
                                                           ),
                                                           child: Center(
-                                                              child: Text(
-                                                            "Sell",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 16,
-                                                                fontFamily:
-                                                                    'ColfaxBold'),
+                                                              child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Text(
+                                                              "Close Position",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 14,
+                                                                  fontFamily:
+                                                                      'ColfaxBold'),
+                                                            ),
                                                           ))),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Entry price: \$ ${entryPrice.toInt()}",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Market price: \$ ${currentPrice.toInt()}",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 12,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -408,6 +872,360 @@ class _BotScreenState extends State<BotScreen> {
       ),
     );
   }
+
+  Widget _buildListViewBot(Size size, BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      sharedPrefs.isBotTrading = false;
+                    });
+                  },
+                  child: Text(
+                    "Switch back to manual trading?",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontFamily: 'ColfaxBold',
+                      fontSize: 17,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(
+                  height: 150,
+                  width: 150,
+                  child: Image.asset("assets/images/001-bot.png"),
+                ),
+                FutureBuilder<BrokerAccountModel?>(
+                  future: apiRequests.connectAlpaca(
+                      controller.userModel.apiKey!,
+                      controller.userModel.secretKey!),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final data = snapshot.data;
+                      final cash = double.tryParse(data!.cash!);
+
+                      return Text(
+                        "Total balance: \$ ${cash!.toInt()}",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'ColfaxBold',
+                          fontSize: 17,
+                        ),
+                      );
+                    }
+                    return SizedBox();
+                  },
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Your trading is being automated!",
+                  style: TextStyle(
+                    color: Commons.myGreenColor,
+                    fontFamily: 'ColfaxBold',
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Cheers 🎉",
+                  style: TextStyle(
+                    color: Commons.myGreenColor,
+                    fontFamily: 'ColfaxBold',
+                    fontSize: 17,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Text(
+              "Current Positions",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'ColfaxBold',
+                fontSize: 18,
+              ),
+            ),
+            GetBuilder<DashboardController>(
+              builder: (ccontroller) {
+                return FutureBuilder<List<PositionModel>?>(
+                    future: apiRequests.getPositions(
+                        controller.userModel.apiKey!,
+                        controller.userModel.secretKey!),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          color: Colors.white,
+                        ));
+                      }
+                      if (snapshot.hasData) {
+                        final data = snapshot.data;
+
+                        return ListView.builder(
+                          itemCount: data!.length,
+                          key: UniqueKey(),
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          // reverse: true,
+                          itemBuilder: (context, index) {
+                            final entryPrice =
+                                double.parse(data[index].avgEntryPrice!);
+                            final currentPrice =
+                                double.parse(data[index].currentPrice!);
+
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                  // height: MediaQuery.of(context).size.height * 0.15,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.95,
+                                  decoration: BoxDecoration(
+                                    color: Commons.mylightColor,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Symbol:",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      " ${data[index].symbol}",
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Quantity: ",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${data[index].qty}",
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Unrealized PnL: ",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "\$ ${data[index].unrealizedPl}",
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: 15,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Order Type: ",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      "${data[index].side}",
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontFamily:
+                                                            'ColfaxBold',
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          Column(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    apiRequests
+                                                        .deletePosition(
+                                                            data[index].symbol!,
+                                                            controller.userModel
+                                                                .apiKey!,
+                                                            controller.userModel
+                                                                .secretKey!)
+                                                        .then((value) => Commons
+                                                            .showSnackBar(
+                                                                "Alert",
+                                                                "Position closed successfully"));
+                                                  },
+                                                  child: Container(
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.red,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                      child: Center(
+                                                          child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Text(
+                                                          "Close Position",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 16,
+                                                              fontFamily:
+                                                                  'ColfaxBold'),
+                                                        ),
+                                                      ))),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Entry price: \$ ${entryPrice.toInt()}",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily: 'ColfaxBold',
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Market price: \$ ${currentPrice.toInt()}",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily: 'ColfaxBold',
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                      return SizedBox();
+                    });
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class ChartView extends StatefulWidget {
@@ -421,6 +1239,7 @@ class _ChartViewState extends State<ChartView> {
   List<Candle> candles = [];
   bool themeIsDark = false;
   final controller = Get.put(ChatController());
+  final dashboardController = Get.put(DashboardController());
 
   @override
   void initState() {
@@ -439,6 +1258,7 @@ class _ChartViewState extends State<ChartView> {
   @override
   void dispose() {
     controller.timer!.cancel();
+
     super.dispose();
   }
 

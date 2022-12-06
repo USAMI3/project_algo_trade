@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -162,10 +164,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               width: 20,
                             ),
                             Padding(
-                              padding: EdgeInsets.only(top: 5),
+                              padding: const EdgeInsets.only(top: 5),
                               child: Text(
                                 dateString,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Commons.myWhiteColor,
                                   fontSize: 12,
                                   fontFamily: 'Colfax',
@@ -238,6 +240,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                   child: ListView(
+                    physics: const BouncingScrollPhysics(),
                     reverse: true,
                     key: UniqueKey(),
                     children: data.map(buildAlert).toList(),

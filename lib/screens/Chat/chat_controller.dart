@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_cast, unused_catch_clause, unused_local_variable
+
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +20,9 @@ class ChatController extends GetxController {
   var users = FirebaseFirestore.instance.collection("users");
   bool dismounted = false;
   Timer? timer;
+  Timer? positionTimer;
+  Timer? balanceTimer;
+  Timer? accountActivityTimer;
   Timer? btcTimer;
   Timer? ethTimer;
   Timer? adaTimer;
@@ -95,9 +100,7 @@ class ChatController extends GetxController {
     for (final doc in collection.docs) {
       currentbatch.delete(doc.reference);
     }
-    return currentbatch.commit().then((value) {
-      print("deleted");
-    });
+    return currentbatch.commit().then((value) {});
   }
 
   Future<void> uploadMessages() async {
@@ -133,7 +136,6 @@ class ChatController extends GetxController {
               merge: true,
             ))
         .then((value) => getName());
-    print("done");
     // await db
     //     .collection("chats")
     //     .doc(user.uid)

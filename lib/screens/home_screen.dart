@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildListView(Size size, BuildContext context) {
     return ListView(
+      physics: const BouncingScrollPhysics(),
       children: [
         Padding(
           padding: EdgeInsets.all(size.width * 0.055),
@@ -172,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
                         dashboardController.formatted,
                         style: const TextStyle(
@@ -183,44 +184,54 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        BuildSymbolCard(
-                          text1: dashboardController.candles!.response![0].s,
-                          text2: dashboardController.candles!.response![0].h,
-                          screen: ChartsView(
-                            link:
-                                "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AEURUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
-                          ),
-                        ),
-                        BuildSymbolCard(
-                            text1: dashboardController.candles2!.response![0].s,
-                            text2: dashboardController.candles2!.response![0].h,
-                            screen: ChartsView(
-                              link:
-                                  "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AAUDUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
-                            )),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        BuildSymbolCard(
-                          text1: dashboardController.candles3!.response![0].s,
-                          text2: dashboardController.candles3!.response![0].h,
-                          screen: ChartsView(
-                            link:
-                                "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AUSDJPY&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
-                          ),
-                        ),
-                        BuildSymbolCard(
-                            text1: "USD/CHF",
-                            text2: "0.9993",
-                            screen: ChartsView(
-                              link:
-                                  "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AUSDCHF&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
-                            )),
-                      ],
-                    ),
+                    dashboardController.candles != null
+                        ? Row(
+                            children: [
+                              BuildSymbolCard(
+                                text1:
+                                    dashboardController.candles!.response![0].s,
+                                text2:
+                                    dashboardController.candles!.response![0].h,
+                                screen: ChartsView(
+                                  link:
+                                      "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AEURUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
+                                ),
+                              ),
+                              BuildSymbolCard(
+                                  text1: dashboardController
+                                      .candles2!.response![0].s,
+                                  text2: dashboardController
+                                      .candles2!.response![0].h,
+                                  screen: ChartsView(
+                                    link:
+                                        "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AAUDUSD&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
+                                  )),
+                            ],
+                          )
+                        : const SizedBox(),
+                    dashboardController.candles != null
+                        ? Row(
+                            children: [
+                              BuildSymbolCard(
+                                text1: dashboardController
+                                    .candles3!.response![0].s,
+                                text2: dashboardController
+                                    .candles3!.response![0].h,
+                                screen: ChartsView(
+                                  link:
+                                      "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AUSDJPY&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
+                                ),
+                              ),
+                              BuildSymbolCard(
+                                  text1: "USD/CHF",
+                                  text2: "0.9993",
+                                  screen: ChartsView(
+                                    link:
+                                        "https://s.tradingview.com/tradingview/widgetembed/?frameElementId=tradingview_259ad&symbol=FX_IDC%3AUSDCHF&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=EEEFF0&studies=%5B%5D&hideideas=1&theme=Dark&timezone=exchange&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=www.dailyfx.com&utm_medium=widget&utm_campaign=chart&utm_term=FX_IDC%3AEURUSD",
+                                  )),
+                            ],
+                          )
+                        : const SizedBox(),
                   ],
                 ),
               ),
@@ -255,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Learn before you leap",
                         style: TextStyle(
                           color: Commons.myWhiteColor,
