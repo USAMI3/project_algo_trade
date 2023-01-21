@@ -14,7 +14,7 @@ class ApiRequests {
   Future<CandleData?> getHttpData() async {
     var client = http.Client();
     var uri = Uri.parse(
-        'https://fcsapi.com/api-v3/forex/latest?id=1&access_key=m7aB2c4qLI3F7y6gJc0Gmv');
+        'https://fcsapi.com/api-v3/forex/latest?id=1&access_key=Kq09h4RZjhPNT5YCPwuqxd');
     var response = await client.get(
       uri,
     );
@@ -246,7 +246,7 @@ class ApiRequests {
   Future<NewsData?> getNewsData() async {
     var client = http.Client();
     var uri = Uri.parse(
-        'https://forexnewsapi.com/api/v1/category?section=general&items=3&page=1&token=inep8aj0vsvkoeqa7vyovqf9kxg3qg7o19fo6snc');
+        'https://forexnewsapi.com/api/v1/category?section=general&items=3&page=1&token=v6sfpefwslxughzhrfwactwdsbibfnzlmysbmfc0');
     var response = await client.get(
       uri,
     );

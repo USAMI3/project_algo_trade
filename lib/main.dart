@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -24,7 +25,9 @@ Future<void> main() async {
   await dashboardController.getNewsData();
 
   // chatController.getName(),
-  await chatController.getName();
+  if (FirebaseAuth.instance.currentUser != null) {
+    await chatController.getName();
+  }
 
   runApp(const MyApp());
 }
